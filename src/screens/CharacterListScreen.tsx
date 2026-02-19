@@ -7,6 +7,7 @@ import { EmptyCharacterList } from '@/features/characters/components/EmptyCharac
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
 import { showDeleteConfirm } from '@/utils/alerts';
 import { Character } from '@/types/character';
+import { STRINGS } from '@/constants/strings';
 
 export function CharacterListScreen({ navigation }: any) {
   const { characters, loadCharacters, deleteCharacter } = useCharacters();
@@ -18,7 +19,7 @@ export function CharacterListScreen({ navigation }: any) {
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Import Error', error);
+      Alert.alert(STRINGS.importError, error);
     }
   }, [error]);
 
@@ -36,18 +37,18 @@ export function CharacterListScreen({ navigation }: any) {
   const handleCharacterLongPress = (character: Character) => {
     Alert.alert(
       character.name,
-      'What would you like to do?',
+      STRINGS.whatToDo,
       [
         {
-          text: 'Edit',
+          text: STRINGS.edit,
           onPress: () => navigation.navigate('CharacterPreview', { character, isNew: false }),
         },
         {
-          text: 'Delete',
+          text: STRINGS.delete,
           style: 'destructive',
           onPress: () => showDeleteConfirm(character.name, () => deleteCharacter(character.id)),
         },
-        { text: 'Cancel', style: 'cancel' },
+        { text: STRINGS.cancel, style: 'cancel' },
       ]
     );
   };
@@ -56,7 +57,7 @@ export function CharacterListScreen({ navigation }: any) {
     <View className="flex-1 bg-gray-100 dark:bg-gray-900">
       <View className="p-4 flex-1">
         <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Characters
+          {STRINGS.characters}
         </Text>
 
         {characters.length === 0 ? (

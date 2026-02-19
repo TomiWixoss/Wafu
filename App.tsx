@@ -10,6 +10,7 @@ import { CharacterPreviewScreen } from './src/screens/CharacterPreviewScreen';
 import { ChatListScreen } from './src/screens/ChatListScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
+import { STRINGS } from './src/constants/strings';
 
 import './global.css';
 
@@ -27,17 +28,17 @@ function CharactersStack() {
       <Stack.Screen 
         name="CharacterPreview" 
         component={CharacterPreviewScreen}
-        options={{ title: 'Character' }}
+        options={{ title: STRINGS.characters }}
       />
       <Stack.Screen 
         name="ChatList" 
         component={ChatListScreen}
-        options={{ title: 'Chats' }}
+        options={{ title: STRINGS.chats }}
       />
       <Stack.Screen 
         name="Chat" 
         component={ChatScreen}
-        options={({ route }: any) => ({ title: route.params?.character?.name || 'Chat' })}
+        options={({ route }: any) => ({ title: route.params?.character?.name || STRINGS.chats })}
       />
     </Stack.Navigator>
   );
@@ -56,7 +57,7 @@ function MainTabs() {
         component={CharactersStack}
         options={{ 
           headerShown: false,
-          tabBarLabel: 'Characters',
+          tabBarLabel: STRINGS.characters,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
           ),
@@ -66,8 +67,8 @@ function MainTabs() {
         name="Settings" 
         component={SettingsScreen}
         options={{ 
-          title: 'Settings',
-          tabBarLabel: 'Settings',
+          title: STRINGS.settings,
+          tabBarLabel: STRINGS.settings,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),

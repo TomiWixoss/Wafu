@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AI_MODELS } from '@/constants/models';
+import { STRINGS } from '@/constants/strings';
 
 interface ModelSelectorProps {
   selectedModel: string;
@@ -14,7 +15,7 @@ export function ModelSelector({ selectedModel, onSelect }: ModelSelectorProps) {
       <View className="flex-row items-center mb-2">
         <Ionicons name="cube-outline" size={18} color="#6B7280" />
         <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-          Model
+          {STRINGS.model}
         </Text>
       </View>
       {AI_MODELS.map((model) => (
@@ -41,7 +42,7 @@ export function ModelSelector({ selectedModel, onSelect }: ModelSelectorProps) {
                 </Text>
                 {model.recommended && (
                   <View className="ml-2 px-2 py-0.5 bg-green-500 rounded">
-                    <Text className="text-white text-xs font-semibold">Recommended</Text>
+                    <Text className="text-white text-xs font-semibold">{STRINGS.recommended}</Text>
                   </View>
                 )}
               </View>

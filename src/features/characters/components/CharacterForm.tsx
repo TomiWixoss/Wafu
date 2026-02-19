@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Character } from '@/types/character';
+import { STRINGS } from '@/constants/strings';
 
 interface CharacterFormProps {
   character: Character;
@@ -22,19 +23,19 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
       {/* Name */}
       <FormField
         icon="person-outline"
-        label="Name"
+        label={STRINGS.name}
         value={character.card.data.name}
         onChange={(text) => onChange('name', text)}
-        placeholder="Character name"
+        placeholder={STRINGS.characterName}
       />
 
       {/* Description */}
       <FormField
         icon="document-text-outline"
-        label="Description"
+        label={STRINGS.description}
         value={character.card.data.description}
         onChange={(text) => onChange('description', text)}
-        placeholder="Character description"
+        placeholder={STRINGS.characterDescription}
         multiline
         numberOfLines={4}
       />
@@ -42,10 +43,10 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
       {/* Personality */}
       <FormField
         icon="happy-outline"
-        label="Personality"
+        label={STRINGS.personality}
         value={character.card.data.personality}
         onChange={(text) => onChange('personality', text)}
-        placeholder="Character personality"
+        placeholder={STRINGS.characterPersonality}
         multiline
         numberOfLines={3}
       />
@@ -53,10 +54,10 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
       {/* Scenario */}
       <FormField
         icon="book-outline"
-        label="Scenario"
+        label={STRINGS.scenario}
         value={character.card.data.scenario}
         onChange={(text) => onChange('scenario', text)}
-        placeholder="Character scenario"
+        placeholder={STRINGS.characterScenario}
         multiline
         numberOfLines={3}
       />
@@ -64,10 +65,10 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
       {/* First Message */}
       <FormField
         icon="chatbubble-outline"
-        label="First Message"
+        label={STRINGS.firstMessage}
         value={character.card.data.first_mes}
         onChange={(text) => onChange('first_mes', text)}
-        placeholder="First message"
+        placeholder={STRINGS.firstMessage}
         multiline
         numberOfLines={3}
       />

@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import { ChatMessage as ChatMessageType } from '@/types/character';
+import { STRINGS } from '@/constants/strings';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -46,7 +47,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               },
             }}
           >
-            {message.content || '_Thinking..._'}
+            {message.content || `_${STRINGS.thinking}_`}
           </Markdown>
         )}
         
@@ -62,7 +63,7 @@ function ThinkingProcess({ reasoning }: { reasoning: string }) {
       <View className="flex-row items-center mb-1">
         <Ionicons name="bulb-outline" size={14} color="#9CA3AF" />
         <Text className="text-xs text-gray-600 dark:text-gray-400 ml-1 font-semibold">
-          Thinking Process
+          {STRINGS.thinkingProcess}
         </Text>
       </View>
       <Text className="text-xs text-gray-600 dark:text-gray-400 italic">

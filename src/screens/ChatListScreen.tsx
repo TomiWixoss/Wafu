@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
 import { showDeleteConfirm } from '@/utils/alerts';
 import { Chat } from '@/types/character';
+import { STRINGS } from '@/constants/strings';
 
 export function ChatListScreen({ route, navigation }: any) {
   const { character } = route.params;
@@ -16,7 +17,7 @@ export function ChatListScreen({ route, navigation }: any) {
       const chat = await createNewChat();
       navigation.navigate('Chat', { chat, character });
     } catch (error) {
-      Alert.alert('Error', 'Failed to create chat');
+      Alert.alert(STRINGS.error, STRINGS.failedToCreate);
     }
   };
 
@@ -26,21 +27,21 @@ export function ChatListScreen({ route, navigation }: any) {
   };
 
   const handleChatLongPress = (chat: Chat) => {
-    showDeleteConfirm('this chat', () => removeChat(chat.id));
+    showDeleteConfirm(STRINGS.deleteChat, () => removeChat(chat.id));
   };
 
   return (
     <View className="flex-1 bg-gray-100 dark:bg-gray-900">
       <View className="p-4 flex-1">
         <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Chats with {character.name}
+          {STRINGS.chatsWith} {character.name}
         </Text>
 
         {chats.length === 0 ? (
           <EmptyState
             icon="chatbubbles-outline"
-            title="No chats yet"
-            description="Start a new conversation!"
+            title={STRINGS.noChats}
+            description={STRINGS.noChatsDesc}
           />
         ) : (
           <FlatList

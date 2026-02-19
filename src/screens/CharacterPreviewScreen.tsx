@@ -4,6 +4,7 @@ import { useCharacterActions } from '@/features/characters/hooks/useCharacters';
 import { CharacterForm } from '@/features/characters/components/CharacterForm';
 import { Button } from '@/components/ui/Button';
 import { Character } from '@/types/character';
+import { STRINGS } from '@/constants/strings';
 
 export function CharacterPreviewScreen({ route, navigation }: any) {
   const { character: initialCharacter, isNew } = route.params;
@@ -21,7 +22,7 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
       }
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', 'Failed to save character');
+      Alert.alert(STRINGS.error, STRINGS.failedToSave);
     } finally {
       setIsSaving(false);
     }
@@ -48,7 +49,7 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
         
         <Button
           onPress={handleSave}
-          title={isNew ? 'Add Character' : 'Save Changes'}
+          title={isNew ? STRINGS.addCharacter : STRINGS.saveChanges}
           icon="checkmark-circle-outline"
           loading={isSaving}
         />

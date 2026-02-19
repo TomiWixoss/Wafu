@@ -3,6 +3,7 @@ import { FlatList, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useChat } from '@/features/chat/hooks/useChat';
 import { ChatMessage } from '@/features/chat/components/ChatMessage';
 import { ChatInput } from '@/features/chat/components/ChatInput';
+import { STRINGS } from '@/constants/strings';
 
 export function ChatScreen({ route }: any) {
   const { chat: initialChat, character } = route.params;
@@ -12,7 +13,7 @@ export function ChatScreen({ route }: any) {
   const handleSend = async () => {
     const result = await sendMessage();
     if (!result.success && result.error) {
-      Alert.alert('Error', result.error);
+      Alert.alert(STRINGS.error, result.error);
     }
   };
 

@@ -6,6 +6,7 @@ import { ModelSelector } from '@/features/settings/components/ModelSelector';
 import { ParameterSlider } from '@/features/settings/components/ParameterSlider';
 import { Button } from '@/components/ui/Button';
 import { showSuccess, showError } from '@/utils/alerts';
+import { STRINGS } from '@/constants/strings';
 
 export function SettingsScreen() {
   const { settings, updateSetting, saveSettings, isSaving } = useSettings();
@@ -13,16 +14,16 @@ export function SettingsScreen() {
   const handleSave = async () => {
     const result = await saveSettings();
     if (result.success) {
-      showSuccess('Settings saved successfully');
+      showSuccess(STRINGS.settingsSaved);
     } else {
-      showError(result.error || 'Failed to save settings');
+      showError(result.error || STRINGS.settingsError);
     }
   };
 
   if (!settings) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <Text className="text-gray-500">Loading...</Text>
+        <Text className="text-gray-500">{STRINGS.loading}</Text>
       </View>
     );
   }
@@ -31,7 +32,7 @@ export function SettingsScreen() {
     <ScrollView className="flex-1 bg-gray-100 dark:bg-gray-900">
       <View className="p-4">
         <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-          AI Settings
+          {STRINGS.aiSettings}
         </Text>
 
         {/* API Key */}
@@ -39,19 +40,19 @@ export function SettingsScreen() {
           <View className="flex-row items-center mb-2">
             <Ionicons name="key-outline" size={18} color="#6B7280" />
             <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-              NVIDIA API Key
+              NVIDIA {STRINGS.apiKey}
             </Text>
           </View>
           <TextInput
             value={settings.apiKey}
             onChangeText={(text) => updateSetting('apiKey', text)}
             className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
-            placeholder="nvapi-xxxxx"
+            placeholder={STRINGS.apiKeyPlaceholder}
             secureTextEntry
             autoCapitalize="none"
           />
           <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Get your API key from build.nvidia.com
+            {STRINGS.apiKeyDesc}
           </Text>
         </View>
 
@@ -64,23 +65,23 @@ export function SettingsScreen() {
         {/* Temperature */}
         <ParameterSlider
           icon="thermometer-outline"
-          label="Temperature"
+          label={STRINGS.temperature}
           value={settings.temperature}
           onChange={(val) => updateSetting('temperature', val)}
           min={0}
           max={2}
-          description="Higher values make output more random"
+          description={STRINGS.temperatureDesc}
         />
 
         {/* Top P */}
         <ParameterSlider
           icon="options-outline"
-          label="Top P"
+          label={STRINGS.topP}
           value={settings.topP}
           onChange={(val) => updateSetting('topP', val)}
           min={0}
           max={1}
-          description="Nucleus sampling threshold"
+          description={STRINGS.topPDesc}
         />
 
         {/* Max Tokens */}
@@ -88,7 +89,7 @@ export function SettingsScreen() {
           <View className="flex-row items-center mb-2">
             <Ionicons name="text-outline" size={18} color="#6B7280" />
             <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-              Max Tokens
+              {STRINGS.maxTokens}
             </Text>
           </View>
           <TextInput
@@ -101,7 +102,7 @@ export function SettingsScreen() {
             className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
           />
           <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Maximum length of generated response
+            {STRINGS.maxTokensDesc}
           </Text>
         </View>
 
@@ -111,11 +112,11 @@ export function SettingsScreen() {
             <View className="flex-row items-center mb-1">
               <Ionicons name="bulb-outline" size={18} color="#6B7280" />
               <Text className="text-sm font-semibold text-gray-900 dark:text-white ml-2">
-                Enable Thinking Mode
+                {STRINGS.enableThinking}
               </Text>
             </View>
             <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Show AI reasoning process (DeepSeek only)
+              {STRINGS.enableThinkingDesc}
             </Text>
           </View>
           <Switch
@@ -127,7 +128,7 @@ export function SettingsScreen() {
         {/* Save Button */}
         <Button
           onPress={handleSave}
-          title="Save Settings"
+          title={STRINGS.saveSettings}
           icon="save-outline"
           loading={isSaving}
         />
@@ -137,7 +138,7 @@ export function SettingsScreen() {
           <View className="flex-row items-start">
             <Ionicons name="information-circle-outline" size={20} color="#3B82F6" />
             <Text className="text-sm text-blue-800 dark:text-blue-200 ml-2 flex-1">
-              You can get a free API key from build.nvidia.com to use DeepSeek and other models.
+              {STRINGS.infoMessage}
             </Text>
           </View>
         </View>

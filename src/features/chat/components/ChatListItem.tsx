@@ -2,7 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
+import { vi } from 'date-fns/locale';
 import { Chat } from '@/types/character';
+import { STRINGS } from '@/constants/strings';
 
 interface ChatListItemProps {
   chat: Chat;
@@ -12,7 +14,7 @@ interface ChatListItemProps {
 
 export function ChatListItem({ chat, onPress, onLongPress }: ChatListItemProps) {
   const lastMessage = chat.messages[chat.messages.length - 1];
-  const timeAgo = formatDistanceToNow(chat.updatedAt, { addSuffix: true });
+  const timeAgo = formatDistanceToNow(chat.updatedAt, { addSuffix: true, locale: vi });
 
   return (
     <TouchableOpacity
@@ -27,7 +29,7 @@ export function ChatListItem({ chat, onPress, onLongPress }: ChatListItemProps) 
         <Ionicons name="chatbubble-outline" size={20} color="#9CA3AF" />
       </View>
       <Text className="text-sm text-gray-600 dark:text-gray-400" numberOfLines={2}>
-        {lastMessage?.content || 'No messages'}
+        {lastMessage?.content || STRINGS.noMessages}
       </Text>
       <View className="flex-row items-center mt-2">
         <Ionicons name="time-outline" size={14} color="#9CA3AF" />

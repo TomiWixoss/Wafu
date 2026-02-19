@@ -2,28 +2,28 @@ export const AI_MODELS = [
   { 
     value: 'deepseek-ai/deepseek-v3.2', 
     label: 'DeepSeek V3.2', 
-    description: 'Latest model with thinking mode',
+    description: 'Mô hình mới nhất với chế độ suy nghĩ',
     recommended: true,
   },
   { 
     value: 'deepseek-ai/deepseek-v3', 
     label: 'DeepSeek V3',
-    description: 'Previous generation',
+    description: 'Thế hệ trước',
   },
   { 
     value: 'meta/llama-3.1-405b-instruct', 
     label: 'Llama 3.1 405B',
-    description: 'Largest Llama model',
+    description: 'Mô hình Llama lớn nhất',
   },
   { 
     value: 'meta/llama-3.1-70b-instruct', 
     label: 'Llama 3.1 70B',
-    description: 'Balanced performance',
+    description: 'Hiệu suất cân bằng',
   },
   { 
     value: 'meta/llama-3.1-8b-instruct', 
     label: 'Llama 3.1 8B',
-    description: 'Fast and efficient',
+    description: 'Nhanh và hiệu quả',
   },
 ] as const;
 

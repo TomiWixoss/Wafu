@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Character } from '@/types/character';
+import { STRINGS } from '@/constants/strings';
 
 interface CharacterCardProps {
   character: Character;
@@ -25,7 +26,7 @@ export function CharacterCard({ character, onPress, onLongPress }: CharacterCard
           {character.name}
         </Text>
         <Text className="text-sm text-gray-600 dark:text-gray-400" numberOfLines={2}>
-          {character.card.data.description || 'No description'}
+          {character.card.data.description || STRINGS.noDescription}
         </Text>
       </View>
       <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />

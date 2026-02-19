@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { STRINGS } from '@/constants/strings';
 
 interface ChatInputProps {
   value: string;
@@ -19,7 +20,7 @@ export function ChatInput({ value, onChange, onSend, isGenerating, disabled }: C
         <TextInput
           value={value}
           onChangeText={onChange}
-          placeholder="Type a message..."
+          placeholder={STRINGS.typeMessage}
           placeholderTextColor="#9CA3AF"
           className="flex-1 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-gray-900 dark:text-white mr-2"
           multiline

@@ -1,10 +1,11 @@
 import { Alert } from 'react-native';
+import { STRINGS } from '@/constants/strings';
 
-export const showError = (message: string, title = 'Error') => {
+export const showError = (message: string, title = STRINGS.errorTitle) => {
   Alert.alert(title, message);
 };
 
-export const showSuccess = (message: string, title = 'Success') => {
+export const showSuccess = (message: string, title = STRINGS.successTitle) => {
   Alert.alert(title, message);
 };
 
@@ -18,8 +19,8 @@ export const showConfirm = (
     title,
     message,
     [
-      { text: 'Cancel', style: 'cancel', onPress: onCancel },
-      { text: 'Confirm', onPress: onConfirm },
+      { text: STRINGS.cancel, style: 'cancel', onPress: onCancel },
+      { text: STRINGS.confirm, onPress: onConfirm },
     ]
   );
 };
@@ -29,11 +30,11 @@ export const showDeleteConfirm = (
   onConfirm: () => void
 ) => {
   Alert.alert(
-    'Delete Confirmation',
-    `Are you sure you want to delete ${itemName}?`,
+    STRINGS.deleteConfirmTitle,
+    `${STRINGS.areYouSure} ${itemName}?`,
     [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: onConfirm },
+      { text: STRINGS.cancel, style: 'cancel' },
+      { text: STRINGS.delete, style: 'destructive', onPress: onConfirm },
     ]
   );
 };
