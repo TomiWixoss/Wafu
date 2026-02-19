@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Alert, Keyboard } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Platform, Alert, Keyboard, StatusBar } from 'react-native';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useChat } from '@/features/chat/hooks/useChat';
 import { ChatMessage } from '@/features/chat/components/ChatMessage';
@@ -11,6 +11,7 @@ export function ChatScreen({ route }: any) {
   const { chat, input, setInput, isGenerating, sendMessage } = useChat(initialChat, character);
   const flatListRef = useRef<FlatList>(null);
   const headerHeight = useHeaderHeight();
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0;
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -33,9 +34,9 @@ export function ChatScreen({ route }: any) {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior="padding"
       className="flex-1 bg-gray-100 dark:bg-gray-900"
-      keyboardVerticalOffset={headerHeight}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : headerHeight - 190}
     >
       <FlatList
         ref={flatListRef}

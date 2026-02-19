@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, Alert } from 'react-native';
+import { View, Text, FlatList, Alert, Platform, StatusBar } from 'react-native';
 import { useChatList } from '@/features/chat/hooks/useChatList';
 import { ChatListItem } from '@/features/chat/components/ChatListItem';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -11,6 +11,7 @@ import { STRINGS } from '@/constants/strings';
 export function ChatListScreen({ route, navigation }: any) {
   const { character } = route.params;
   const { chats, isLoading, createNewChat, removeChat, setCurrentChat } = useChatList(character);
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0;
 
   const handleNewChat = async () => {
     try {

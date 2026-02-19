@@ -56,7 +56,7 @@ export async function parseCharacterCard(uri: string): Promise<{
 
     return {
       card: cardData,
-      imageBase64: base64,
+      imageBase64: `data:image/png;base64,${base64}`,
     };
   } catch (error) {
     console.error('=== ERROR PARSING CHARACTER ===');

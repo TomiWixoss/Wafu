@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { Platform, StatusBar as RNStatusBar, View } from 'react-native';
 
 import { CharacterListScreen } from './src/screens/CharacterListScreen';
 import { CharacterPreviewScreen } from './src/screens/CharacterPreviewScreen';
@@ -24,6 +25,9 @@ function CharactersStack() {
       screenOptions={{
         headerShadowVisible: false,
         contentStyle: { backgroundColor: '#F3F4F6' },
+        headerStyle: {
+          backgroundColor: '#FFFFFF',
+        },
       }}
     >
       <Stack.Screen 
@@ -90,9 +94,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar style="dark" />
         <NavigationContainer>
           <MainTabs />
-          <StatusBar style="auto" />
         </NavigationContainer>
       </GestureHandlerRootView>
     </SafeAreaProvider>

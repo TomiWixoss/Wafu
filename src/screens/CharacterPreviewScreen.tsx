@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Alert } from 'react-native';
+import { ScrollView, View, Alert, Platform, StatusBar } from 'react-native';
 import { useCharacterActions } from '@/features/characters/hooks/useCharacters';
 import { CharacterForm } from '@/features/characters/components/CharacterForm';
 import { Button } from '@/components/ui/Button';
@@ -11,6 +11,7 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
   const { importCharacter, editCharacter } = useCharacterActions();
   const [character, setCharacter] = useState<Character>(initialCharacter);
   const [isSaving, setIsSaving] = useState(false);
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0;
 
   const handleSave = async () => {
     setIsSaving(true);
