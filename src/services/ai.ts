@@ -1,3 +1,4 @@
+import OpenAI from 'openai';
 import { AISettings, ChatMessage, CharacterCard } from '../types/character';
 
 export interface StreamChunk {
@@ -15,91 +16,65 @@ export async function* streamChat(
     throw new Error('API key not configured');
   }
 
+  // Initialize OpenAI client with NVIDIA endpoint
+  const openai = new OpenAI({
+    apiKey: settings.apiKey,
+    baseURL: 'https://integrate.api.nvidia.com/v1',
+  });
+
   // Build system prompt
   const systemPrompt = buildSystemPrompt(character);
 
   // Convert messages to OpenAI format
-  const apiMessages = [
+  const apiMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: 'system', content: systemPrompt },
-    ...messages.map(m => ({
-      role: m.role === 'assistant' ? 'assistant' : 'user',
-      content: m.content,
-    })),
+    ...messages.map(m => {
+      const msg: OpenAI.Chat.ChatCompletionMessageParam = {
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: m.content,
+      };
+      
+      // Include reasoning_content for assistant messages if available
+      if (m.role === 'assistant' && m.reasoning) {
+        (msg as any).reasoning_content = m.reasoning;
+      }
+      
+      return msg;
+    }),
   ];
 
-  const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${settings.apiKey}`,
-    },
-    body: JSON.stringify({
+  try {
+    const stream = await openai.chat.completions.create({
       model: settings.model,
       messages: apiMessages,
       temperature: settings.temperature,
       top_p: settings.topP,
       max_tokens: settings.maxTokens,
       stream: true,
-      ...(settings.enableThinking && {
+      // Enable thinking mode for DeepSeek models
+      ...(settings.enableThinking && settings.model.includes('deepseek') && {
+        // @ts-ignore - NVIDIA API specific parameter
         chat_template_kwargs: { thinking: true },
       }),
-    }),
-  });
+    });
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`API Error: ${response.status} - ${error}`);
-  }
-
-  const reader = response.body?.getReader();
-  if (!reader) {
-    throw new Error('No response body');
-  }
-
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta;
       
-      if (done) {
-        yield { done: true };
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          
-          if (data === '[DONE]') {
-            yield { done: true };
-            return;
-          }
-
-          try {
-            const parsed = JSON.parse(data);
-            const delta = parsed.choices?.[0]?.delta;
-
-            if (delta) {
-              yield {
-                content: delta.content || undefined,
-                reasoning: delta.reasoning_content || undefined,
-                done: false,
-              };
-            }
-          } catch (e) {
-            // Skip invalid JSON
-          }
-        }
+      if (delta) {
+        yield {
+          content: delta.content || undefined,
+          // @ts-ignore - reasoning_content is NVIDIA/DeepSeek specific
+          reasoning: delta.reasoning_content || undefined,
+          done: false,
+        };
       }
     }
-  } finally {
-    reader.releaseLock();
+
+    yield { done: true };
+  } catch (error) {
+    console.error('Stream error:', error);
+    throw error;
   }
 }
 
@@ -112,7 +87,7 @@ function buildSystemPrompt(character: CharacterCard): string {
   }
 
   // Character description
-  parts.push(`Character: ${character.data.name}`);
+  parts.push(`You are ${character.data.name}.`);
   
   if (character.data.description) {
     parts.push(`Description: ${character.data.description}`);

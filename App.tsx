@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Ionicons } from '@expo/vector-icons';
 
 import { CharacterListScreen } from './src/screens/CharacterListScreen';
 import { CharacterPreviewScreen } from './src/screens/CharacterPreviewScreen';
@@ -56,6 +57,9 @@ function MainTabs() {
         options={{ 
           headerShown: false,
           tabBarLabel: 'Characters',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen 
@@ -64,6 +68,9 @@ function MainTabs() {
         options={{ 
           title: 'Settings',
           tabBarLabel: 'Settings',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>

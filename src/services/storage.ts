@@ -87,7 +87,7 @@ export async function getAISettings(): Promise<AISettings> {
   const data = await AsyncStorage.getItem(KEYS.AI_SETTINGS);
   return data ? JSON.parse(data) : {
     apiKey: '',
-    model: 'deepseek-ai/deepseek-v3',
+    model: 'deepseek-ai/deepseek-v3.2',
     temperature: 1,
     topP: 0.95,
     maxTokens: 8192,

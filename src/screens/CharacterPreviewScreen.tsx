@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../store/useStore';
 import { Character } from '../types/character';
 
@@ -48,9 +49,12 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
 
         {/* Name */}
         <View className="mb-4">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Name
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="person-outline" size={18} color="#6B7280" />
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
+              Name
+            </Text>
+          </View>
           <TextInput
             value={character.card.data.name}
             onChangeText={(text) => {
@@ -64,9 +68,12 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
 
         {/* Description */}
         <View className="mb-4">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Description
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="document-text-outline" size={18} color="#6B7280" />
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
+              Description
+            </Text>
+          </View>
           <TextInput
             value={character.card.data.description}
             onChangeText={(text) => updateField('description', text)}
@@ -79,9 +86,12 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
 
         {/* Personality */}
         <View className="mb-4">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Personality
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="happy-outline" size={18} color="#6B7280" />
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
+              Personality
+            </Text>
+          </View>
           <TextInput
             value={character.card.data.personality}
             onChangeText={(text) => updateField('personality', text)}
@@ -94,9 +104,12 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
 
         {/* Scenario */}
         <View className="mb-4">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Scenario
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="book-outline" size={18} color="#6B7280" />
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
+              Scenario
+            </Text>
+          </View>
           <TextInput
             value={character.card.data.scenario}
             onChangeText={(text) => updateField('scenario', text)}
@@ -109,9 +122,12 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
 
         {/* First Message */}
         <View className="mb-4">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            First Message
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="chatbubble-outline" size={18} color="#6B7280" />
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
+              First Message
+            </Text>
+          </View>
           <TextInput
             value={character.card.data.first_mes}
             onChangeText={(text) => updateField('first_mes', text)}
@@ -125,9 +141,10 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
         {/* Save Button */}
         <TouchableOpacity
           onPress={handleSave}
-          className="bg-blue-500 p-4 rounded-lg items-center mb-6"
+          className="bg-blue-500 p-4 rounded-lg items-center mb-6 flex-row justify-center"
         >
-          <Text className="text-white font-semibold text-lg">
+          <Ionicons name="checkmark-circle-outline" size={24} color="white" />
+          <Text className="text-white font-semibold text-lg ml-2">
             {isNew ? 'Add Character' : 'Save Changes'}
           </Text>
         </TouchableOpacity>

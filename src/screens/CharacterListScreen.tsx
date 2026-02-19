@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../store/useStore';
 import { parseCharacterCard } from '../utils/characterParser';
 import { Character } from '../types/character';
@@ -94,20 +95,25 @@ export function CharacterListScreen({ navigation }: any) {
           {item.card.data.description || 'No description'}
         </Text>
       </View>
+      <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
     </TouchableOpacity>
   );
 
   return (
     <View className="flex-1 bg-gray-100 dark:bg-gray-900">
-      <View className="p-4">
+      <View className="p-4 flex-1">
         <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           Characters
         </Text>
 
         {characters.length === 0 ? (
-          <View className="items-center justify-center py-20">
-            <Text className="text-gray-500 dark:text-gray-400 text-center mb-4">
-              No characters yet.{'\n'}Import a character card to get started!
+          <View className="items-center justify-center flex-1">
+            <Ionicons name="people-outline" size={64} color="#9CA3AF" />
+            <Text className="text-gray-500 dark:text-gray-400 text-center mt-4 mb-2 text-lg">
+              No characters yet
+            </Text>
+            <Text className="text-gray-400 dark:text-gray-500 text-center px-8">
+              Import a character card to get started!
             </Text>
           </View>
         ) : (
@@ -121,9 +127,10 @@ export function CharacterListScreen({ navigation }: any) {
 
         <TouchableOpacity
           onPress={handleImportCharacter}
-          className="absolute bottom-6 right-6 bg-blue-500 w-14 h-14 rounded-full items-center justify-center shadow-lg"
+          className="absolute bottom-6 right-6 bg-blue-500 w-16 h-16 rounded-full items-center justify-center shadow-lg"
+          style={{ elevation: 5 }}
         >
-          <Text className="text-white text-2xl">+</Text>
+          <Ionicons name="add" size={32} color="white" />
         </TouchableOpacity>
       </View>
     </View>

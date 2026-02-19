@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Markdown from 'react-native-markdown-display';
 import { useStore } from '../store/useStore';
 import { Chat, ChatMessage } from '../types/character';
 import { streamChat } from '../services/ai';
@@ -125,14 +127,48 @@ export function ChatScreen({ route }: any) {
               : 'bg-white dark:bg-gray-800'
           }`}
         >
-          <Text className={isUser ? 'text-white' : 'text-gray-900 dark:text-white'}>
-            {item.content}
-          </Text>
+          {isUser ? (
+            <Text className="text-white">{item.content}</Text>
+          ) : (
+            <Markdown
+              style={{
+                body: { color: '#111827' },
+                text: { color: '#111827' },
+                code_inline: { 
+                  backgroundColor: '#F3F4F6',
+                  color: '#1F2937',
+                  paddingHorizontal: 4,
+                  paddingVertical: 2,
+                  borderRadius: 4,
+                },
+                code_block: {
+                  backgroundColor: '#1F2937',
+                  color: '#F9FAFB',
+                  padding: 12,
+                  borderRadius: 8,
+                },
+                fence: {
+                  backgroundColor: '#1F2937',
+                  color: '#F9FAFB',
+                  padding: 12,
+                  borderRadius: 8,
+                },
+              }}
+            >
+              {item.content || '_Thinking..._'}
+            </Markdown>
+          )}
           
           {item.reasoning && (
             <View className="mt-2 pt-2 border-t border-gray-300 dark:border-gray-600">
+              <View className="flex-row items-center mb-1">
+                <Ionicons name="bulb-outline" size={14} color="#9CA3AF" />
+                <Text className="text-xs text-gray-600 dark:text-gray-400 ml-1 font-semibold">
+                  Thinking Process
+                </Text>
+              </View>
               <Text className="text-xs text-gray-600 dark:text-gray-400 italic">
-                Thinking: {item.reasoning}
+                {item.reasoning}
               </Text>
             </View>
           )}
@@ -179,7 +215,7 @@ export function ChatScreen({ route }: any) {
             {isGenerating ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text className="text-white text-xl">→</Text>
+              <Ionicons name="send" size={20} color="white" />
             )}
           </TouchableOpacity>
         </View>

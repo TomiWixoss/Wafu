@@ -4,10 +4,11 @@ import { useStore } from '../store/useStore';
 import { AISettings } from '../types/character';
 
 const MODELS = [
+  { value: 'deepseek-ai/deepseek-v3.2', label: 'DeepSeek V3.2 (Recommended)' },
   { value: 'deepseek-ai/deepseek-v3', label: 'DeepSeek V3' },
-  { value: 'deepseek-ai/deepseek-v3.2', label: 'DeepSeek V3.2' },
   { value: 'meta/llama-3.1-405b-instruct', label: 'Llama 3.1 405B' },
   { value: 'meta/llama-3.1-70b-instruct', label: 'Llama 3.1 70B' },
+  { value: 'meta/llama-3.1-8b-instruct', label: 'Llama 3.1 8B' },
 ];
 
 export function SettingsScreen() {
