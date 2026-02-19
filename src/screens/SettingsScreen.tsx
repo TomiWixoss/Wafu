@@ -1,38 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
-import { useStore } from '../store/useStore';
-import { AISettings } from '../types/character';
-
-const MODELS = [
-  { value: 'deepseek-ai/deepseek-v3.2', label: 'DeepSeek V3.2 (Recommended)' },
-  { value: 'deepseek-ai/deepseek-v3', label: 'DeepSeek V3' },
-  { value: 'meta/llama-3.1-405b-instruct', label: 'Llama 3.1 405B' },
-  { value: 'meta/llama-3.1-70b-instruct', label: 'Llama 3.1 70B' },
-  { value: 'meta/llama-3.1-8b-instruct', label: 'Llama 3.1 8B' },
-];
+import React from 'react';
+import { ScrollView, View, Text, TextInput, Switch } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useSettings } from '@/features/settings/hooks/useSettings';
+import { ModelSelector } from '@/features/settings/components/ModelSelector';
+import { ParameterSlider } from '@/features/settings/components/ParameterSlider';
+import { Button } from '@/components/ui/Button';
+import { showSuccess, showError } from '@/utils/alerts';
 
 export function SettingsScreen() {
-  const { aiSettings, loadAISettings, updateAISettings } = useStore();
-  const [settings, setSettings] = useState<AISettings | null>(null);
-
-  useEffect(() => {
-    loadAISettings();
-  }, []);
-
-  useEffect(() => {
-    if (aiSettings) {
-      setSettings(aiSettings);
-    }
-  }, [aiSettings]);
+  const { settings, updateSetting, saveSettings, isSaving } = useSettings();
 
   const handleSave = async () => {
-    if (!settings) return;
-
-    try {
-      await updateAISettings(settings);
-      Alert.alert('Success', 'Settings saved successfully');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save settings');
+    const result = await saveSettings();
+    if (result.success) {
+      showSuccess('Settings saved successfully');
+    } else {
+      showError(result.error || 'Failed to save settings');
     }
   };
 
@@ -53,12 +36,15 @@ export function SettingsScreen() {
 
         {/* API Key */}
         <View className="mb-6">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            NVIDIA API Key
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="key-outline" size={18} color="#6B7280" />
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
+              NVIDIA API Key
+            </Text>
+          </View>
           <TextInput
             value={settings.apiKey}
-            onChangeText={(text) => setSettings({ ...settings, apiKey: text })}
+            onChangeText={(text) => updateSetting('apiKey', text)}
             className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
             placeholder="nvapi-xxxxx"
             secureTextEntry
@@ -70,93 +56,46 @@ export function SettingsScreen() {
         </View>
 
         {/* Model Selection */}
-        <View className="mb-6">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Model
-          </Text>
-          {MODELS.map((model) => (
-            <TouchableOpacity
-              key={model.value}
-              onPress={() => setSettings({ ...settings, model: model.value })}
-              className={`p-3 rounded-lg mb-2 ${
-                settings.model === model.value
-                  ? 'bg-blue-500'
-                  : 'bg-white dark:bg-gray-800'
-              }`}
-            >
-              <Text
-                className={
-                  settings.model === model.value
-                    ? 'text-white font-semibold'
-                    : 'text-gray-900 dark:text-white'
-                }
-              >
-                {model.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <ModelSelector
+          selectedModel={settings.model}
+          onSelect={(model) => updateSetting('model', model)}
+        />
 
         {/* Temperature */}
-        <View className="mb-6">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Temperature: {settings.temperature.toFixed(2)}
-          </Text>
-          <View className="flex-row items-center">
-            <Text className="text-gray-600 dark:text-gray-400 mr-2">0</Text>
-            <View className="flex-1">
-              <TextInput
-                value={settings.temperature.toString()}
-                onChangeText={(text) => {
-                  const val = parseFloat(text) || 0;
-                  setSettings({ ...settings, temperature: Math.max(0, Math.min(2, val)) });
-                }}
-                keyboardType="decimal-pad"
-                className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white text-center"
-              />
-            </View>
-            <Text className="text-gray-600 dark:text-gray-400 ml-2">2</Text>
-          </View>
-          <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Higher values make output more random
-          </Text>
-        </View>
+        <ParameterSlider
+          icon="thermometer-outline"
+          label="Temperature"
+          value={settings.temperature}
+          onChange={(val) => updateSetting('temperature', val)}
+          min={0}
+          max={2}
+          description="Higher values make output more random"
+        />
 
         {/* Top P */}
-        <View className="mb-6">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Top P: {settings.topP.toFixed(2)}
-          </Text>
-          <View className="flex-row items-center">
-            <Text className="text-gray-600 dark:text-gray-400 mr-2">0</Text>
-            <View className="flex-1">
-              <TextInput
-                value={settings.topP.toString()}
-                onChangeText={(text) => {
-                  const val = parseFloat(text) || 0;
-                  setSettings({ ...settings, topP: Math.max(0, Math.min(1, val)) });
-                }}
-                keyboardType="decimal-pad"
-                className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white text-center"
-              />
-            </View>
-            <Text className="text-gray-600 dark:text-gray-400 ml-2">1</Text>
-          </View>
-          <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Nucleus sampling threshold
-          </Text>
-        </View>
+        <ParameterSlider
+          icon="options-outline"
+          label="Top P"
+          value={settings.topP}
+          onChange={(val) => updateSetting('topP', val)}
+          min={0}
+          max={1}
+          description="Nucleus sampling threshold"
+        />
 
         {/* Max Tokens */}
         <View className="mb-6">
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Max Tokens
-          </Text>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="text-outline" size={18} color="#6B7280" />
+            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
+              Max Tokens
+            </Text>
+          </View>
           <TextInput
             value={settings.maxTokens.toString()}
             onChangeText={(text) => {
-              const val = parseInt(text) || 0;
-              setSettings({ ...settings, maxTokens: Math.max(1, Math.min(32000, val)) });
+              const val = parseInt(text) || 1;
+              updateSetting('maxTokens', Math.max(1, Math.min(32000, val)));
             }}
             keyboardType="number-pad"
             className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
@@ -169,32 +108,38 @@ export function SettingsScreen() {
         {/* Enable Thinking */}
         <View className="mb-6 flex-row items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg">
           <View className="flex-1">
-            <Text className="text-sm font-semibold text-gray-900 dark:text-white">
-              Enable Thinking Mode
-            </Text>
+            <View className="flex-row items-center mb-1">
+              <Ionicons name="bulb-outline" size={18} color="#6B7280" />
+              <Text className="text-sm font-semibold text-gray-900 dark:text-white ml-2">
+                Enable Thinking Mode
+              </Text>
+            </View>
             <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Show AI reasoning process (DeepSeek only)
             </Text>
           </View>
           <Switch
             value={settings.enableThinking}
-            onValueChange={(value) => setSettings({ ...settings, enableThinking: value })}
+            onValueChange={(value) => updateSetting('enableThinking', value)}
           />
         </View>
 
         {/* Save Button */}
-        <TouchableOpacity
+        <Button
           onPress={handleSave}
-          className="bg-blue-500 p-4 rounded-lg items-center mb-6"
-        >
-          <Text className="text-white font-semibold text-lg">Save Settings</Text>
-        </TouchableOpacity>
+          title="Save Settings"
+          icon="save-outline"
+          loading={isSaving}
+        />
 
         {/* Info */}
-        <View className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-          <Text className="text-sm text-blue-800 dark:text-blue-200">
-            💡 Tip: You can get a free API key from build.nvidia.com to use DeepSeek and other models.
-          </Text>
+        <View className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mt-4">
+          <View className="flex-row items-start">
+            <Ionicons name="information-circle-outline" size={20} color="#3B82F6" />
+            <Text className="text-sm text-blue-800 dark:text-blue-200 ml-2 flex-1">
+              You can get a free API key from build.nvidia.com to use DeepSeek and other models.
+            </Text>
+          </View>
         </View>
       </View>
     </ScrollView>

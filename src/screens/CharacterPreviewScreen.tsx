@@ -1,31 +1,36 @@
 import React, { useState } from 'react';
-import { View, Text, Image, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useStore } from '../store/useStore';
-import { Character } from '../types/character';
+import { ScrollView, View, Alert } from 'react-native';
+import { useCharacterActions } from '@/features/characters/hooks/useCharacters';
+import { CharacterForm } from '@/features/characters/components/CharacterForm';
+import { Button } from '@/components/ui/Button';
+import { Character } from '@/types/character';
 
 export function CharacterPreviewScreen({ route, navigation }: any) {
   const { character: initialCharacter, isNew } = route.params;
-  const { addCharacter, updateCharacter } = useStore();
-
+  const { importCharacter, editCharacter } = useCharacterActions();
   const [character, setCharacter] = useState<Character>(initialCharacter);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       if (isNew) {
-        await addCharacter(character);
+        await importCharacter(character);
       } else {
-        await updateCharacter({ ...character, updatedAt: Date.now() });
+        await editCharacter(character);
       }
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to save character');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const updateField = (field: string, value: string) => {
     setCharacter(prev => ({
       ...prev,
+      name: field === 'name' ? value : prev.name,
       card: {
         ...prev.card,
         data: {
@@ -39,115 +44,14 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
   return (
     <ScrollView className="flex-1 bg-gray-100 dark:bg-gray-900">
       <View className="p-4">
-        {/* Avatar */}
-        <View className="items-center mb-6">
-          <Image
-            source={{ uri: `data:image/png;base64,${character.avatar}` }}
-            className="w-32 h-32 rounded-full"
-          />
-        </View>
-
-        {/* Name */}
-        <View className="mb-4">
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="person-outline" size={18} color="#6B7280" />
-            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-              Name
-            </Text>
-          </View>
-          <TextInput
-            value={character.card.data.name}
-            onChangeText={(text) => {
-              updateField('name', text);
-              setCharacter(prev => ({ ...prev, name: text }));
-            }}
-            className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
-            placeholder="Character name"
-          />
-        </View>
-
-        {/* Description */}
-        <View className="mb-4">
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="document-text-outline" size={18} color="#6B7280" />
-            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-              Description
-            </Text>
-          </View>
-          <TextInput
-            value={character.card.data.description}
-            onChangeText={(text) => updateField('description', text)}
-            className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
-            placeholder="Character description"
-            multiline
-            numberOfLines={4}
-          />
-        </View>
-
-        {/* Personality */}
-        <View className="mb-4">
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="happy-outline" size={18} color="#6B7280" />
-            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-              Personality
-            </Text>
-          </View>
-          <TextInput
-            value={character.card.data.personality}
-            onChangeText={(text) => updateField('personality', text)}
-            className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
-            placeholder="Character personality"
-            multiline
-            numberOfLines={3}
-          />
-        </View>
-
-        {/* Scenario */}
-        <View className="mb-4">
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="book-outline" size={18} color="#6B7280" />
-            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-              Scenario
-            </Text>
-          </View>
-          <TextInput
-            value={character.card.data.scenario}
-            onChangeText={(text) => updateField('scenario', text)}
-            className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
-            placeholder="Character scenario"
-            multiline
-            numberOfLines={3}
-          />
-        </View>
-
-        {/* First Message */}
-        <View className="mb-4">
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="chatbubble-outline" size={18} color="#6B7280" />
-            <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-              First Message
-            </Text>
-          </View>
-          <TextInput
-            value={character.card.data.first_mes}
-            onChangeText={(text) => updateField('first_mes', text)}
-            className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
-            placeholder="First message"
-            multiline
-            numberOfLines={3}
-          />
-        </View>
-
-        {/* Save Button */}
-        <TouchableOpacity
+        <CharacterForm character={character} onChange={updateField} />
+        
+        <Button
           onPress={handleSave}
-          className="bg-blue-500 p-4 rounded-lg items-center mb-6 flex-row justify-center"
-        >
-          <Ionicons name="checkmark-circle-outline" size={24} color="white" />
-          <Text className="text-white font-semibold text-lg ml-2">
-            {isNew ? 'Add Character' : 'Save Changes'}
-          </Text>
-        </TouchableOpacity>
+          title={isNew ? 'Add Character' : 'Save Changes'}
+          icon="checkmark-circle-outline"
+          loading={isSaving}
+        />
       </View>
     </ScrollView>
   );
