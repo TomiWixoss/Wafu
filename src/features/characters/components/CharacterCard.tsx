@@ -17,10 +17,16 @@ export function CharacterCard({ character, onPress, onLongPress }: CharacterCard
       onLongPress={onLongPress}
       className="flex-row items-center p-4 bg-white dark:bg-gray-800 rounded-lg mb-3 shadow"
     >
-      <Image
-        source={{ uri: `data:image/png;base64,${character.avatar}` }}
-        className="w-16 h-16 rounded-full"
-      />
+      {character.avatar ? (
+        <Image
+          source={{ uri: character.avatar }}
+          className="w-16 h-16 rounded-full"
+        />
+      ) : (
+        <View className="w-16 h-16 rounded-full bg-gray-300 dark:bg-gray-700 items-center justify-center">
+          <Ionicons name="person" size={32} color="#9CA3AF" />
+        </View>
+      )}
       <View className="flex-1 ml-4">
         <Text className="text-lg font-bold text-gray-900 dark:text-white">
           {character.name}

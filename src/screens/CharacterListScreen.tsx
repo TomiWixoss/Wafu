@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCharacters } from '@/features/characters/hooks/useCharacters';
 import { useCharacterImport } from '@/features/characters/hooks/useCharacterImport';
 import { CharacterCard } from '@/features/characters/components/CharacterCard';
@@ -54,7 +55,7 @@ export function CharacterListScreen({ navigation }: any) {
   };
 
   return (
-    <View className="flex-1 bg-gray-100 dark:bg-gray-900">
+    <SafeAreaView className="flex-1 bg-gray-100 dark:bg-gray-900" edges={['top']}>
       <View className="p-4 flex-1">
         <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           {STRINGS.characters}
@@ -79,6 +80,6 @@ export function CharacterListScreen({ navigation }: any) {
 
         <FloatingActionButton onPress={handleImport} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

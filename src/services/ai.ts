@@ -1,3 +1,4 @@
+import { fetch } from 'expo/fetch';
 import OpenAI from 'openai';
 import { AISettings, ChatMessage, CharacterCard } from '../types/character';
 
@@ -16,10 +17,11 @@ export async function* streamChat(
     throw new Error('API key not configured');
   }
 
-  // Initialize OpenAI client with NVIDIA endpoint
+  // Initialize OpenAI client with NVIDIA endpoint and expo/fetch
   const openai = new OpenAI({
     apiKey: settings.apiKey,
     baseURL: 'https://integrate.api.nvidia.com/v1',
+    fetch: fetch as any, // Use expo/fetch for streaming support
   });
 
   // Build system prompt
@@ -51,8 +53,8 @@ export async function* streamChat(
       top_p: settings.topP,
       max_tokens: settings.maxTokens,
       stream: true,
-      // Enable thinking mode for DeepSeek models
-      ...(settings.enableThinking && settings.model.includes('deepseek') && {
+      // Enable thinking mode for DeepSeek and Step models
+      ...(settings.enableThinking && (settings.model.includes('deepseek') || settings.model.includes('step')) && {
         // @ts-ignore - NVIDIA API specific parameter
         chat_template_kwargs: { thinking: true },
       }),

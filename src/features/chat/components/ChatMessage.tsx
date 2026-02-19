@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import { ChatMessage as ChatMessageType } from '@/types/character';
@@ -13,10 +13,18 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user';
 
   return (
-    <View className={`mb-4 ${isUser ? 'items-end' : 'items-start'}`}>
+    <View className={`mb-4 ${isUser ? 'items-end' : 'items-start w-full'}`}>
+      {/* Reasoning section (AI only, shown first) */}
+      {!isUser && message.reasoning && (
+        <ThinkingProcess reasoning={message.reasoning} />
+      )}
+
+      {/* Main message content */}
       <View
-        className={`max-w-[80%] p-3 rounded-lg ${
-          isUser ? 'bg-blue-500' : 'bg-white dark:bg-gray-800'
+        className={`${
+          isUser 
+            ? 'max-w-[80%] p-3 rounded-lg bg-blue-500' 
+            : 'w-full'
         }`}
       >
         {isUser ? (
@@ -45,30 +53,52 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 padding: 12,
                 borderRadius: 8,
               },
+              image: {
+                maxWidth: 200,
+                maxHeight: 200,
+              },
+            }}
+            rules={{
+              image: (node, children, parent, styles) => {
+                return null; // Disable images in markdown to avoid key prop error
+              },
             }}
           >
             {message.content || `_${STRINGS.thinking}_`}
           </Markdown>
         )}
-        
-        {message.reasoning && <ThinkingProcess reasoning={message.reasoning} />}
       </View>
     </View>
   );
 }
 
 function ThinkingProcess({ reasoning }: { reasoning: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
-    <View className="mt-2 pt-2 border-t border-gray-300 dark:border-gray-600">
-      <View className="flex-row items-center mb-1">
-        <Ionicons name="bulb-outline" size={14} color="#9CA3AF" />
-        <Text className="text-xs text-gray-600 dark:text-gray-400 ml-1 font-semibold">
-          {STRINGS.thinkingProcess}
+    <View className="w-full mb-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+      <TouchableOpacity 
+        onPress={() => setIsExpanded(!isExpanded)}
+        className="flex-row items-center justify-between"
+      >
+        <View className="flex-row items-center flex-1">
+          <Ionicons name="bulb" size={16} color="#F59E0B" />
+          <Text className="text-sm text-amber-700 dark:text-amber-400 ml-2 font-semibold">
+            {STRINGS.thinkingProcess}
+          </Text>
+        </View>
+        <Ionicons 
+          name={isExpanded ? "chevron-up" : "chevron-down"} 
+          size={20} 
+          color="#F59E0B" 
+        />
+      </TouchableOpacity>
+      
+      {isExpanded && (
+        <Text className="text-sm text-amber-800 dark:text-amber-300 mt-2 leading-5">
+          {reasoning}
         </Text>
-      </View>
-      <Text className="text-xs text-gray-600 dark:text-gray-400 italic">
-        {reasoning}
-      </Text>
+      )}
     </View>
   );
 }

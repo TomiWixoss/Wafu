@@ -1,5 +1,11 @@
 export const AI_MODELS = [
   { 
+    value: 'stepfun-ai/step-3.5-flash', 
+    label: 'Step 3.5 Flash', 
+    description: 'Mô hình nhanh với reasoning',
+    recommended: true as const,
+  },
+  { 
     value: 'deepseek-ai/deepseek-v3.2', 
     label: 'DeepSeek V3.2', 
     description: 'Mô hình mới nhất với chế độ suy nghĩ',

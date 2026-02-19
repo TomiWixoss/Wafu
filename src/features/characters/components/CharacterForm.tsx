@@ -14,10 +14,16 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
     <View>
       {/* Avatar */}
       <View className="items-center mb-6">
-        <Image
-          source={{ uri: `data:image/png;base64,${character.avatar}` }}
-          className="w-32 h-32 rounded-full"
-        />
+        {character.avatar ? (
+          <Image
+            source={{ uri: character.avatar }}
+            className="w-32 h-32 rounded-full"
+          />
+        ) : (
+          <View className="w-32 h-32 rounded-full bg-gray-300 dark:bg-gray-700 items-center justify-center">
+            <Ionicons name="person" size={64} color="#9CA3AF" />
+          </View>
+        )}
       </View>
 
       {/* Name */}

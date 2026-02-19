@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { CharacterListScreen } from './src/screens/CharacterListScreen';
@@ -19,7 +20,12 @@ const Tab = createBottomTabNavigator();
 
 function CharactersStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: '#F3F4F6' },
+      }}
+    >
       <Stack.Screen 
         name="CharacterList" 
         component={CharacterListScreen}
@@ -38,7 +44,9 @@ function CharactersStack() {
       <Stack.Screen 
         name="Chat" 
         component={ChatScreen}
-        options={({ route }: any) => ({ title: route.params?.character?.name || STRINGS.chats })}
+        options={({ route }: any) => ({ 
+          title: route.params?.character?.name || STRINGS.chats,
+        })}
       />
     </Stack.Navigator>
   );
@@ -80,11 +88,13 @@ function MainTabs() {
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <MainTabs />
-        <StatusBar style="auto" />
-      </NavigationContainer>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <MainTabs />
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }

@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system/legacy';
 import { Character, Chat, AISettings } from '../types/character';
 
 const KEYS = {
@@ -7,23 +8,103 @@ const KEYS = {
   AI_SETTINGS: '@ai_settings',
 };
 
+const AVATAR_DIR = `${FileSystem.documentDirectory}avatars/`;
+
+// Avatar file system helpers
+async function ensureAvatarDir(): Promise<void> {
+  const dirInfo = await FileSystem.getInfoAsync(AVATAR_DIR);
+  if (!dirInfo.exists) {
+    await FileSystem.makeDirectoryAsync(AVATAR_DIR, { intermediates: true });
+  }
+}
+
+async function saveAvatar(characterId: string, base64: string): Promise<void> {
+  await ensureAvatarDir();
+  const filePath = `${AVATAR_DIR}${characterId}.png`;
+  await FileSystem.writeAsStringAsync(filePath, base64, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+}
+
+async function loadAvatar(characterId: string): Promise<string> {
+  const filePath = `${AVATAR_DIR}${characterId}.png`;
+  const fileInfo = await FileSystem.getInfoAsync(filePath);
+  
+  if (!fileInfo.exists) {
+    return '';
+  }
+  
+  const base64 = await FileSystem.readAsStringAsync(filePath, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+  
+  return `data:image/png;base64,${base64}`;
+}
+
+async function deleteAvatar(characterId: string): Promise<void> {
+  const filePath = `${AVATAR_DIR}${characterId}.png`;
+  const fileInfo = await FileSystem.getInfoAsync(filePath);
+  
+  if (fileInfo.exists) {
+    await FileSystem.deleteAsync(filePath);
+  }
+}
+
 // Characters
 export async function saveCharacter(character: Character): Promise<void> {
-  const characters = await getCharacters();
+  // Save avatar to file system if exists
+  if (character.avatar) {
+    // Extract base64 from data URL
+    const base64 = character.avatar.replace(/^data:image\/\w+;base64,/, '');
+    await saveAvatar(character.id, base64);
+  }
+  
+  // Create character without avatar for AsyncStorage
+  const characterWithoutAvatar = {
+    ...character,
+    avatar: '', // Remove avatar from AsyncStorage
+  };
+  
+  const characters = await getCharactersWithoutAvatars();
   const index = characters.findIndex(c => c.id === character.id);
   
   if (index >= 0) {
-    characters[index] = character;
+    characters[index] = characterWithoutAvatar;
   } else {
-    characters.push(character);
+    characters.push(characterWithoutAvatar);
   }
   
-  await AsyncStorage.setItem(KEYS.CHARACTERS, JSON.stringify(characters));
+  const jsonString = JSON.stringify(characters);
+  
+  try {
+    await AsyncStorage.setItem(KEYS.CHARACTERS, jsonString);
+  } catch (error) {
+    console.error('Error saving character:', error);
+    throw error;
+  }
+}
+
+// Helper to get characters without avatars (internal use)
+async function getCharactersWithoutAvatars(): Promise<Character[]> {
+  const data = await AsyncStorage.getItem(KEYS.CHARACTERS);
+  return data ? JSON.parse(data) : [];
 }
 
 export async function getCharacters(): Promise<Character[]> {
-  const data = await AsyncStorage.getItem(KEYS.CHARACTERS);
-  return data ? JSON.parse(data) : [];
+  const characters = await getCharactersWithoutAvatars();
+  
+  // Load avatars from file system
+  const charactersWithAvatars = await Promise.all(
+    characters.map(async (character) => {
+      const avatar = await loadAvatar(character.id);
+      return {
+        ...character,
+        avatar,
+      };
+    })
+  );
+  
+  return charactersWithAvatars;
 }
 
 export async function getCharacter(id: string): Promise<Character | null> {
@@ -32,7 +113,10 @@ export async function getCharacter(id: string): Promise<Character | null> {
 }
 
 export async function deleteCharacter(id: string): Promise<void> {
-  const characters = await getCharacters();
+  // Delete avatar from file system
+  await deleteAvatar(id);
+  
+  const characters = await getCharactersWithoutAvatars();
   const filtered = characters.filter(c => c.id !== id);
   await AsyncStorage.setItem(KEYS.CHARACTERS, JSON.stringify(filtered));
   
