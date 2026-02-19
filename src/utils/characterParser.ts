@@ -1,5 +1,7 @@
 import * as FileSystem from 'expo-file-system';
+// @ts-ignore - No types available
 import extract from 'png-chunks-extract';
+// @ts-ignore - No types available
 import text from 'png-chunk-text';
 import { CharacterCard } from '../types/character';
 
@@ -13,7 +15,7 @@ export async function parseCharacterCard(uri: string): Promise<{
   try {
     // Read file as base64
     const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: 'base64' as any,
     });
 
     // Convert base64 to buffer
@@ -24,8 +26,8 @@ export async function parseCharacterCard(uri: string): Promise<{
 
     // Find text chunks
     const textChunks = chunks
-      .filter(chunk => chunk.name === 'tEXt')
-      .map(chunk => text.decode(chunk.data));
+      .filter((chunk: any) => chunk.name === 'tEXt')
+      .map((chunk: any) => text.decode(chunk.data));
 
     // Look for chara or ccv3 chunk
     let cardData: CharacterCard | null = null;
