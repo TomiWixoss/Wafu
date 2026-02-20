@@ -23,9 +23,9 @@ export function useChatList(character: Character) {
     }
   };
 
-  const createNewChat = async () => {
+  const createNewChat = async (greeting?: string) => {
     try {
-      const chat = await createChat(character.id);
+      const chat = await createChat(character.id, greeting);
       setCurrentChat(chat);
       return chat;
     } catch (error) {

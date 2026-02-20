@@ -1,53 +1,126 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { Text, ActivityIndicator, Pressable } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import clsx from 'clsx';
+import { COLORS, RADII, FONT_FAMILY, FONT_SIZE, SPACING, SHADOWS, ANIMATION } from '@/constants/theme';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface ButtonProps {
   onPress: () => void;
   title: string;
   icon?: keyof typeof Ionicons.glyphMap;
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   disabled?: boolean;
+  fullWidth?: boolean;
 }
 
-export function Button({ 
-  onPress, 
-  title, 
-  icon, 
-  variant = 'primary', 
-  loading, 
-  disabled 
-}: ButtonProps) {
-  const isDisabled = disabled || loading;
+const VARIANT_STYLES = {
+  primary: {
+    bg: COLORS.primary[600],
+    bgDisabled: COLORS.neutral[200],
+    text: COLORS.neutral[0],
+    textDisabled: COLORS.neutral[400],
+  },
+  secondary: {
+    bg: COLORS.neutral[100],
+    bgDisabled: COLORS.neutral[100],
+    text: COLORS.neutral[800],
+    textDisabled: COLORS.neutral[400],
+  },
+  danger: {
+    bg: COLORS.error.main,
+    bgDisabled: COLORS.neutral[200],
+    text: COLORS.neutral[0],
+    textDisabled: COLORS.neutral[400],
+  },
+  ghost: {
+    bg: 'transparent',
+    bgDisabled: 'transparent',
+    text: COLORS.primary[600],
+    textDisabled: COLORS.neutral[400],
+  },
+};
 
-  const buttonClass = clsx(
-    'p-4 rounded-lg items-center flex-row justify-center',
-    {
-      'bg-blue-500': variant === 'primary' && !isDisabled,
-      'bg-gray-500': variant === 'secondary' && !isDisabled,
-      'bg-red-500': variant === 'danger' && !isDisabled,
-      'bg-gray-300': isDisabled,
-    }
-  );
+const SIZE_STYLES = {
+  sm: { paddingH: SPACING.lg, paddingV: SPACING.md, fontSize: FONT_SIZE.sm, iconSize: 16 },
+  md: { paddingH: SPACING.xl, paddingV: SPACING.lg, fontSize: FONT_SIZE.base, iconSize: 20 },
+  lg: { paddingH: SPACING['3xl'], paddingV: SPACING.xl, fontSize: FONT_SIZE.lg, iconSize: 22 },
+};
+
+export function Button({
+  onPress,
+  title,
+  icon,
+  variant = 'primary',
+  size = 'md',
+  loading,
+  disabled,
+  fullWidth = true,
+}: ButtonProps) {
+  const scale = useSharedValue(1);
+  const isDisabled = disabled || loading;
+  const v = VARIANT_STYLES[variant];
+  const s = SIZE_STYLES[size];
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <TouchableOpacity
+    <AnimatedPressable
       onPress={onPress}
       disabled={isDisabled}
-      className={buttonClass}
+      onPressIn={() => {
+        if (!isDisabled) scale.value = withSpring(ANIMATION.pressScale, ANIMATION.spring);
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, ANIMATION.spring);
+      }}
+      style={[
+        animatedStyle,
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: isDisabled ? v.bgDisabled : v.bg,
+          paddingHorizontal: s.paddingH,
+          paddingVertical: s.paddingV,
+          borderRadius: RADII.xl,
+          alignSelf: fullWidth ? 'stretch' : 'flex-start',
+          ...(variant !== 'ghost' && !isDisabled ? SHADOWS.sm : {}),
+        },
+      ]}
     >
       {loading ? (
-        <ActivityIndicator color="white" />
+        <ActivityIndicator color={v.text} size="small" />
       ) : (
         <>
-          {icon && <Ionicons name={icon} size={24} color="white" />}
-          <Text className="text-white font-semibold text-lg ml-2">
+          {icon && (
+            <Ionicons
+              name={icon}
+              size={s.iconSize}
+              color={isDisabled ? v.textDisabled : v.text}
+              style={{ marginRight: SPACING.md }}
+            />
+          )}
+          <Text
+            style={{
+              fontFamily: FONT_FAMILY.semibold,
+              fontSize: s.fontSize,
+              color: isDisabled ? v.textDisabled : v.text,
+            }}
+          >
             {title}
           </Text>
         </>
       )}
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 }

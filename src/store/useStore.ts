@@ -14,12 +14,14 @@ interface AppState {
   updateCharacter: (character: Character) => Promise<void>;
   deleteCharacter: (id: string) => Promise<void>;
   setCurrentCharacter: (character: Character | null) => void;
+  toggleFavorite: (id: string) => Promise<void>;
   
   loadChat: (chatId: string) => Promise<void>;
-  createChat: (characterId: string) => Promise<Chat>;
+  createChat: (characterId: string, greeting?: string) => Promise<Chat>;
   updateChat: (chat: Chat) => Promise<void>;
   deleteChat: (chatId: string) => Promise<void>;
   setCurrentChat: (chat: Chat | null) => void;
+  deleteMessage: (chatId: string, messageId: string) => Promise<void>;
   
   loadAISettings: () => Promise<void>;
   updateAISettings: (settings: AISettings) => Promise<void>;
@@ -33,7 +35,13 @@ export const useStore = create<AppState>((set, get) => ({
 
   loadCharacters: async () => {
     const characters = await storage.getCharacters();
-    set({ characters });
+    // Sort favorites first, then by updatedAt
+    const sorted = characters.sort((a, b) => {
+      if (a.isFavorite && !b.isFavorite) return -1;
+      if (!a.isFavorite && b.isFavorite) return 1;
+      return b.updatedAt - a.updatedAt;
+    });
+    set({ characters: sorted });
   },
 
   addCharacter: async (character) => {
@@ -45,7 +53,6 @@ export const useStore = create<AppState>((set, get) => ({
     await storage.saveCharacter(character);
     await get().loadCharacters();
     
-    // Update current character if it's the same one
     if (get().currentCharacter?.id === character.id) {
       set({ currentCharacter: character });
     }
@@ -55,7 +62,6 @@ export const useStore = create<AppState>((set, get) => ({
     await storage.deleteCharacter(id);
     await get().loadCharacters();
     
-    // Clear current character if it was deleted
     if (get().currentCharacter?.id === id) {
       set({ currentCharacter: null, currentChat: null });
     }
@@ -65,14 +71,26 @@ export const useStore = create<AppState>((set, get) => ({
     set({ currentCharacter: character });
   },
 
+  toggleFavorite: async (id) => {
+    const characters = get().characters;
+    const character = characters.find(c => c.id === id);
+    if (!character) return;
+    
+    const updated = { ...character, isFavorite: !character.isFavorite };
+    await storage.saveCharacter(updated);
+    await get().loadCharacters();
+  },
+
   loadChat: async (chatId) => {
     const chat = await storage.getChat(chatId);
     set({ currentChat: chat });
   },
 
-  createChat: async (characterId) => {
+  createChat: async (characterId, greeting) => {
     const character = await storage.getCharacter(characterId);
     if (!character) throw new Error('Character not found');
+
+    const firstMessage = greeting || character.card.data.first_mes || 'Hello!';
 
     const chat: Chat = {
       id: Date.now().toString(),
@@ -81,7 +99,7 @@ export const useStore = create<AppState>((set, get) => ({
         {
           id: Date.now().toString(),
           role: 'assistant',
-          content: character.card.data.first_mes || 'Hello!',
+          content: firstMessage,
           timestamp: Date.now(),
         },
       ],
@@ -98,7 +116,6 @@ export const useStore = create<AppState>((set, get) => ({
   updateChat: async (chat) => {
     await storage.saveChat(chat);
     
-    // Update current chat if it's the same one
     if (get().currentChat?.id === chat.id) {
       set({ currentChat: chat });
     }
@@ -107,7 +124,6 @@ export const useStore = create<AppState>((set, get) => ({
   deleteChat: async (chatId) => {
     await storage.deleteChat(chatId);
     
-    // Clear current chat if it was deleted
     if (get().currentChat?.id === chatId) {
       set({ currentChat: null });
     }
@@ -115,6 +131,25 @@ export const useStore = create<AppState>((set, get) => ({
 
   setCurrentChat: (chat) => {
     set({ currentChat: chat });
+  },
+
+  deleteMessage: async (chatId, messageId) => {
+    const chat = await storage.getChat(chatId);
+    if (!chat) return;
+    
+    const updatedChat = {
+      ...chat,
+      messages: chat.messages.map(msg =>
+        msg.id === messageId ? { ...msg, isDeleted: true, content: '' } : msg
+      ),
+      updatedAt: Date.now(),
+    };
+    
+    await storage.saveChat(updatedChat);
+    
+    if (get().currentChat?.id === chatId) {
+      set({ currentChat: updatedChat });
+    }
   },
 
   loadAISettings: async () => {

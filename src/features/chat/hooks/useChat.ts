@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 import { Chat, ChatMessage, Character } from '@/types/character';
 import { streamChat } from '@/services/ai';
+import { STRINGS } from '@/constants/strings';
 
 export function useChat(initialChat: Chat, character: Character) {
-  const { updateChat, aiSettings, loadAISettings } = useStore();
+  const { updateChat, aiSettings, loadAISettings, deleteMessage: storeDeleteMessage } = useStore();
   const [chat, setChat] = useState<Chat>(initialChat);
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -14,8 +15,12 @@ export function useChat(initialChat: Chat, character: Character) {
   }, []);
 
   const sendMessage = async () => {
-    if (!input.trim() || isGenerating || !aiSettings?.apiKey) {
-      return { success: false, error: 'Invalid input or missing API key' };
+    if (!input.trim() || isGenerating) {
+      return { success: false, error: STRINGS.invalidInput };
+    }
+    
+    if (!aiSettings?.apiKey) {
+      return { success: false, error: STRINGS.apiKeyRequired };
     }
 
     const userMessage: ChatMessage = {
@@ -86,11 +91,21 @@ export function useChat(initialChat: Chat, character: Character) {
 
       return { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: error instanceof Error ? error.message : STRINGS.failedToGenerate 
       };
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const deleteMessage = async (messageId: string) => {
+    await storeDeleteMessage(chat.id, messageId);
+    setChat(prev => ({
+      ...prev,
+      messages: prev.messages.map(msg =>
+        msg.id === messageId ? { ...msg, isDeleted: true, content: '' } : msg
+      ),
+    }));
   };
 
   return {
@@ -99,5 +114,6 @@ export function useChat(initialChat: Chat, character: Character) {
     setInput,
     isGenerating,
     sendMessage,
+    deleteMessage,
   };
 }

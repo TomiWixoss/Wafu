@@ -1,22 +1,47 @@
 import React from 'react';
-import { View, Text, FlatList, Alert, Platform, StatusBar } from 'react-native';
+import { View, Text, FlatList, Alert } from 'react-native';
 import { useChatList } from '@/features/chat/hooks/useChatList';
 import { ChatListItem } from '@/features/chat/components/ChatListItem';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
+import { Avatar } from '@/components/ui/Avatar';
+import { Card } from '@/components/ui/Card';
 import { showDeleteConfirm } from '@/utils/alerts';
 import { Chat } from '@/types/character';
+import { COLORS, FONT_FAMILY, FONT_SIZE, SPACING, LINE_HEIGHT } from '@/constants/theme';
 import { STRINGS } from '@/constants/strings';
 
 export function ChatListScreen({ route, navigation }: any) {
   const { character } = route.params;
   const { chats, isLoading, createNewChat, removeChat, setCurrentChat } = useChatList(character);
-  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0;
 
   const handleNewChat = async () => {
     try {
-      const chat = await createNewChat();
-      navigation.navigate('Chat', { chat, character });
+      // Check for alternate greetings
+      const altGreetings = character.card.data.alternate_greetings;
+      if (altGreetings && altGreetings.length > 0) {
+        const options = [
+          { text: STRINGS.cancel, style: 'cancel' as const },
+          {
+            text: character.card.data.first_mes?.slice(0, 30) + '...' || 'Default',
+            onPress: async () => {
+              const chat = await createNewChat();
+              navigation.navigate('Chat', { chat, character });
+            },
+          },
+          ...altGreetings.map((greeting: string, i: number) => ({
+            text: greeting.slice(0, 30) + '...',
+            onPress: async () => {
+              const chat = await createNewChat(greeting);
+              navigation.navigate('Chat', { chat, character });
+            },
+          })),
+        ];
+        Alert.alert(STRINGS.selectGreeting, undefined, options);
+      } else {
+        const chat = await createNewChat();
+        navigation.navigate('Chat', { chat, character });
+      }
     } catch (error) {
       Alert.alert(STRINGS.error, STRINGS.failedToCreate);
     }
@@ -32,11 +57,38 @@ export function ChatListScreen({ route, navigation }: any) {
   };
 
   return (
-    <View className="flex-1 bg-gray-100 dark:bg-gray-900">
-      <View className="p-4 flex-1">
-        <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          {STRINGS.chatsWith} {character.name}
-        </Text>
+    <View style={{ flex: 1, backgroundColor: COLORS.neutral[50] }}>
+      <View style={{ flex: 1, paddingHorizontal: SPACING.xl }}>
+        {/* Character Info Card */}
+        <View style={{ marginTop: SPACING.xl, marginBottom: SPACING.xl }}>
+          <Card>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Avatar uri={character.avatar} name={character.name} size="xl" />
+              <View style={{ flex: 1, marginLeft: SPACING.xl }}>
+                <Text
+                  style={{
+                    fontFamily: FONT_FAMILY.bold,
+                    fontSize: FONT_SIZE.xl,
+                    lineHeight: LINE_HEIGHT.xl,
+                    color: COLORS.neutral[900],
+                  }}
+                >
+                  {character.name}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: FONT_FAMILY.regular,
+                    fontSize: FONT_SIZE.sm,
+                    color: COLORS.neutral[500],
+                    marginTop: 2,
+                  }}
+                >
+                  {chats.length} {STRINGS.totalChats}
+                </Text>
+              </View>
+            </View>
+          </Card>
+        </View>
 
         {chats.length === 0 ? (
           <EmptyState
@@ -56,10 +108,11 @@ export function ChatListScreen({ route, navigation }: any) {
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
           />
         )}
 
-        <FloatingActionButton onPress={handleNewChat} />
+        <FloatingActionButton onPress={handleNewChat} icon="chatbubble" />
       </View>
     </View>
   );

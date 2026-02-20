@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, TextInput, Image } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Character } from '@/types/character';
+import { Avatar } from '@/components/ui/Avatar';
+import { COLORS, FONT_FAMILY, FONT_SIZE, LINE_HEIGHT, SPACING, RADII } from '@/constants/theme';
 import { STRINGS } from '@/constants/strings';
 
 interface CharacterFormProps {
@@ -13,31 +15,42 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
   return (
     <View>
       {/* Avatar */}
-      <View className="items-center mb-6">
-        {character.avatar ? (
-          <Image
-            source={{ uri: character.avatar }}
-            className="w-32 h-32 rounded-full"
-          />
-        ) : (
-          <View className="w-32 h-32 rounded-full bg-gray-300 dark:bg-gray-700 items-center justify-center">
-            <Ionicons name="person" size={64} color="#9CA3AF" />
-          </View>
+      <View style={{ alignItems: 'center', marginBottom: SPACING['4xl'] }}>
+        <Avatar uri={character.avatar} name={character.name} size="4xl" />
+        <Text
+          style={{
+            fontFamily: FONT_FAMILY.bold,
+            fontSize: FONT_SIZE['2xl'],
+            color: COLORS.neutral[900],
+            marginTop: SPACING.xl,
+          }}
+        >
+          {character.card.data.name || STRINGS.characterName}
+        </Text>
+        {character.card.data.creator && (
+          <Text
+            style={{
+              fontFamily: FONT_FAMILY.regular,
+              fontSize: FONT_SIZE.sm,
+              color: COLORS.neutral[400],
+              marginTop: SPACING.xs,
+            }}
+          >
+            by {character.card.data.creator}
+          </Text>
         )}
       </View>
 
-      {/* Name */}
+      {/* Basic Info Section */}
+      <SectionHeader icon="person-outline" title={STRINGS.basicInfo} />
       <FormField
-        icon="person-outline"
         label={STRINGS.name}
         value={character.card.data.name}
         onChange={(text) => onChange('name', text)}
         placeholder={STRINGS.characterName}
       />
 
-      {/* Description */}
       <FormField
-        icon="document-text-outline"
         label={STRINGS.description}
         value={character.card.data.description}
         onChange={(text) => onChange('description', text)}
@@ -46,9 +59,9 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
         numberOfLines={4}
       />
 
-      {/* Personality */}
+      {/* Personality Section */}
+      <SectionHeader icon="sparkles-outline" title={STRINGS.personalityAndScenario} />
       <FormField
-        icon="happy-outline"
         label={STRINGS.personality}
         value={character.card.data.personality}
         onChange={(text) => onChange('personality', text)}
@@ -57,9 +70,7 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
         numberOfLines={3}
       />
 
-      {/* Scenario */}
       <FormField
-        icon="book-outline"
         label={STRINGS.scenario}
         value={character.card.data.scenario}
         onChange={(text) => onChange('scenario', text)}
@@ -68,22 +79,58 @@ export function CharacterForm({ character, onChange }: CharacterFormProps) {
         numberOfLines={3}
       />
 
-      {/* First Message */}
+      {/* Conversation Section */}
+      <SectionHeader icon="chatbubbles-outline" title={STRINGS.conversation} />
       <FormField
-        icon="chatbubble-outline"
         label={STRINGS.firstMessage}
         value={character.card.data.first_mes}
         onChange={(text) => onChange('first_mes', text)}
         placeholder={STRINGS.firstMessage}
         multiline
-        numberOfLines={3}
+        numberOfLines={4}
       />
     </View>
   );
 }
 
+function SectionHeader({ icon, title }: { icon: keyof typeof Ionicons.glyphMap; title: string }) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: SPACING['3xl'],
+        marginBottom: SPACING.xl,
+      }}
+    >
+      <View
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: COLORS.primary[100],
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginRight: SPACING.lg,
+        }}
+      >
+        <Ionicons name={icon} size={16} color={COLORS.primary[600]} />
+      </View>
+      <Text
+        style={{
+          fontFamily: FONT_FAMILY.semibold,
+          fontSize: FONT_SIZE.lg,
+          lineHeight: LINE_HEIGHT.lg,
+          color: COLORS.neutral[900],
+        }}
+      >
+        {title}
+      </Text>
+    </View>
+  );
+}
+
 interface FormFieldProps {
-  icon: keyof typeof Ionicons.glyphMap;
   label: string;
   value: string;
   onChange: (text: string) => void;
@@ -92,22 +139,37 @@ interface FormFieldProps {
   numberOfLines?: number;
 }
 
-function FormField({ icon, label, value, onChange, placeholder, multiline, numberOfLines }: FormFieldProps) {
+function FormField({ label, value, onChange, placeholder, multiline, numberOfLines }: FormFieldProps) {
   return (
-    <View className="mb-4">
-      <View className="flex-row items-center mb-2">
-        <Ionicons name={icon} size={18} color="#6B7280" />
-        <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-          {label}
-        </Text>
-      </View>
+    <View style={{ marginBottom: SPACING.xl }}>
+      <Text
+        style={{
+          fontFamily: FONT_FAMILY.medium,
+          fontSize: FONT_SIZE.sm,
+          color: COLORS.neutral[600],
+          marginBottom: SPACING.md,
+        }}
+      >
+        {label}
+      </Text>
       <TextInput
         value={value}
         onChangeText={onChange}
-        className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white"
         placeholder={placeholder}
+        placeholderTextColor={COLORS.neutral[400]}
         multiline={multiline}
         numberOfLines={numberOfLines}
+        style={{
+          backgroundColor: COLORS.neutral[0],
+          padding: SPACING.xl,
+          borderRadius: RADII.xl,
+          fontFamily: FONT_FAMILY.regular,
+          fontSize: FONT_SIZE.base,
+          color: COLORS.neutral[900],
+          borderWidth: 1.5,
+          borderColor: COLORS.neutral[200],
+          ...(multiline && { textAlignVertical: 'top', minHeight: (numberOfLines || 3) * 24 }),
+        }}
       />
     </View>
   );

@@ -27,6 +27,7 @@ export interface Character {
   card: CharacterCard;
   createdAt: number;
   updatedAt: number;
+  isFavorite?: boolean;
 }
 
 export interface ChatMessage {
@@ -35,6 +36,7 @@ export interface ChatMessage {
   content: string;
   timestamp: number;
   reasoning?: string;
+  isDeleted?: boolean;
 }
 
 export interface Chat {

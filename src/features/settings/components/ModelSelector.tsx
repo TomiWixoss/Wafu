@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AI_MODELS } from '@/constants/models';
+import { Badge } from '@/components/ui/Badge';
+import { COLORS, FONT_FAMILY, FONT_SIZE, LINE_HEIGHT, SPACING, RADII } from '@/constants/theme';
 import { STRINGS } from '@/constants/strings';
 
 interface ModelSelectorProps {
@@ -11,57 +13,96 @@ interface ModelSelectorProps {
 
 export function ModelSelector({ selectedModel, onSelect }: ModelSelectorProps) {
   return (
-    <View className="mb-6">
-      <View className="flex-row items-center mb-2">
-        <Ionicons name="cube-outline" size={18} color="#6B7280" />
-        <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-          {STRINGS.model}
-        </Text>
-      </View>
-      {AI_MODELS.map((model) => (
-        <TouchableOpacity
-          key={model.value}
-          onPress={() => onSelect(model.value)}
-          className={`p-3 rounded-lg mb-2 ${
-            selectedModel === model.value
-              ? 'bg-blue-500'
-              : 'bg-white dark:bg-gray-800'
-          }`}
-        >
-          <View className="flex-row items-center justify-between">
-            <View className="flex-1">
-              <View className="flex-row items-center">
+    <View style={{ marginBottom: SPACING['3xl'] }}>
+      <Text
+        style={{
+          fontFamily: FONT_FAMILY.semibold,
+          fontSize: FONT_SIZE.sm,
+          color: COLORS.neutral[600],
+          marginBottom: SPACING.lg,
+          textTransform: 'uppercase',
+          letterSpacing: 0.5,
+        }}
+      >
+        {STRINGS.model}
+      </Text>
+
+      {AI_MODELS.map((model) => {
+        const isSelected = selectedModel === model.value;
+        return (
+          <TouchableOpacity
+            key={model.value}
+            onPress={() => onSelect(model.value)}
+            activeOpacity={0.7}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: SPACING.xl,
+              borderRadius: RADII.xl,
+              marginBottom: SPACING.md,
+              backgroundColor: isSelected ? COLORS.primary[50] : COLORS.neutral[0],
+              borderWidth: 1.5,
+              borderColor: isSelected ? COLORS.primary[500] : COLORS.neutral[200],
+            }}
+          >
+            {/* Radio circle */}
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 10,
+                borderWidth: 2,
+                borderColor: isSelected ? COLORS.primary[600] : COLORS.neutral[300],
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: SPACING.lg,
+              }}
+            >
+              {isSelected && (
+                <View
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: COLORS.primary[600],
+                  }}
+                />
+              )}
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.md }}>
                 <Text
-                  className={
-                    selectedModel === model.value
-                      ? 'text-white font-semibold'
-                      : 'text-gray-900 dark:text-white'
-                  }
+                  style={{
+                    fontFamily: FONT_FAMILY.semibold,
+                    fontSize: FONT_SIZE.base,
+                    color: isSelected ? COLORS.primary[700] : COLORS.neutral[900],
+                  }}
                 >
                   {model.label}
                 </Text>
                 {model.recommended && (
-                  <View className="ml-2 px-2 py-0.5 bg-green-500 rounded">
-                    <Text className="text-white text-xs font-semibold">{STRINGS.recommended}</Text>
-                  </View>
+                  <Badge label={STRINGS.recommended} variant="success" size="sm" />
                 )}
               </View>
               <Text
-                className={`text-xs mt-1 ${
-                  selectedModel === model.value
-                    ? 'text-blue-100'
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}
+                style={{
+                  fontFamily: FONT_FAMILY.regular,
+                  fontSize: FONT_SIZE.sm,
+                  color: COLORS.neutral[500],
+                  marginTop: 2,
+                }}
               >
                 {model.description}
               </Text>
             </View>
-            {selectedModel === model.value && (
-              <Ionicons name="checkmark-circle" size={24} color="white" />
+
+            {isSelected && (
+              <Ionicons name="checkmark-circle" size={22} color={COLORS.primary[600]} />
             )}
-          </View>
-        </TouchableOpacity>
-      ))}
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }

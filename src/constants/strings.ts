@@ -8,11 +8,15 @@ export const STRINGS = {
   loading: 'Đang tải...',
   error: 'Lỗi',
   success: 'Thành công',
+  search: 'Tìm kiếm...',
+  copy: 'Sao chép',
+  copied: 'Đã sao chép!',
+  regenerate: 'Tạo lại',
   
   // Characters
   characters: 'Nhân vật',
   noCharacters: 'Chưa có nhân vật',
-  noCharactersDesc: 'Nhập ảnh character card để bắt đầu!',
+  noCharactersDesc: 'Nhập ảnh character card để bắt đầu trò chuyện!',
   addCharacter: 'Thêm nhân vật',
   editCharacter: 'Sửa nhân vật',
   deleteCharacter: 'Xóa nhân vật',
@@ -20,6 +24,9 @@ export const STRINGS = {
   importCharacter: 'Nhập nhân vật',
   importError: 'Lỗi nhập nhân vật',
   importSuccess: 'Nhập nhân vật thành công',
+  favoriteAdded: 'Đã ghim nhân vật',
+  favoriteRemoved: 'Đã bỏ ghim nhân vật',
+  searchCharacters: 'Tìm nhân vật...',
   
   // Character Form
   name: 'Tên',
@@ -32,6 +39,9 @@ export const STRINGS = {
   characterPersonality: 'Tính cách nhân vật',
   characterScenario: 'Kịch bản nhân vật',
   noDescription: 'Không có mô tả',
+  basicInfo: 'Thông tin cơ bản',
+  personalityAndScenario: 'Tính cách & Kịch bản',
+  conversation: 'Cuộc trò chuyện',
   
   // Chat
   chats: 'Cuộc trò chuyện',
@@ -45,6 +55,12 @@ export const STRINGS = {
   noMessages: 'Chưa có tin nhắn',
   thinking: 'Đang suy nghĩ...',
   thinkingProcess: 'Quá trình suy nghĩ',
+  deleteMessage: 'Xóa tin nhắn',
+  deleteMessageConfirm: 'Bạn có chắc muốn xóa tin nhắn này?',
+  messageDeleted: 'Đã xóa tin nhắn',
+  messageActions: 'Hành động',
+  selectGreeting: 'Chọn lời chào',
+  messages: 'tin nhắn',
   
   // Settings
   settings: 'Cài đặt',
@@ -59,13 +75,19 @@ export const STRINGS = {
   topPDesc: 'Ngưỡng nucleus sampling',
   maxTokens: 'Số token tối đa',
   maxTokensDesc: 'Độ dài tối đa của phản hồi',
-  enableThinking: 'Bật chế độ suy nghĩ',
-  enableThinkingDesc: 'Hiển thị quá trình suy nghĩ của AI (chỉ DeepSeek)',
+  enableThinking: 'Chế độ suy nghĩ',
+  enableThinkingDesc: 'Hiển thị quá trình suy nghĩ của AI (DeepSeek)',
   saveSettings: 'Lưu cài đặt',
   settingsSaved: 'Đã lưu cài đặt',
   settingsError: 'Lỗi khi lưu cài đặt',
   apiKeyRequired: 'Vui lòng cấu hình API key trong Cài đặt',
   infoMessage: 'Bạn có thể lấy API key miễn phí từ build.nvidia.com để sử dụng DeepSeek và các mô hình khác.',
+  appearance: 'Giao diện',
+  about: 'Thông tin',
+  appVersion: 'Phiên bản',
+  credits: 'Nguồn',
+  creditsDesc: 'SillyTavern (Character Card format), NVIDIA (API), DeepSeek (AI models)',
+  parameters: 'Tham số',
   
   // Models
   recommended: 'Đề xuất',
@@ -99,4 +121,9 @@ export const STRINGS = {
   // Actions
   whatToDo: 'Bạn muốn làm gì?',
   saveChanges: 'Lưu thay đổi',
+  
+  // Stats
+  totalChats: 'Cuộc chat',
+  totalMessages: 'Tin nhắn',
+  createdDate: 'Ngày tạo',
 } as const;

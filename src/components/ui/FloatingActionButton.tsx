@@ -1,6 +1,14 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Pressable } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS, SHADOWS, ANIMATION } from '@/constants/theme';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface FloatingActionButtonProps {
   onPress: () => void;
@@ -8,13 +16,38 @@ interface FloatingActionButtonProps {
 }
 
 export function FloatingActionButton({ onPress, icon = 'add' }: FloatingActionButtonProps) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <TouchableOpacity
+    <AnimatedPressable
       onPress={onPress}
-      className="absolute bottom-6 right-6 bg-blue-500 w-16 h-16 rounded-full items-center justify-center shadow-lg"
-      style={{ elevation: 5 }}
+      onPressIn={() => {
+        scale.value = withSpring(0.9, ANIMATION.spring);
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, ANIMATION.spring);
+      }}
+      style={[
+        animatedStyle,
+        {
+          position: 'absolute',
+          bottom: 24,
+          right: 24,
+          width: 56,
+          height: 56,
+          borderRadius: 28,
+          backgroundColor: COLORS.primary[600],
+          alignItems: 'center',
+          justifyContent: 'center',
+          ...SHADOWS.lg,
+        },
+      ]}
     >
-      <Ionicons name={icon} size={32} color="white" />
-    </TouchableOpacity>
+      <Ionicons name={icon} size={28} color={COLORS.neutral[0]} />
+    </AnimatedPressable>
   );
 }

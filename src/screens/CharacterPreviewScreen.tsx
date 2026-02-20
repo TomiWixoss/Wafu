@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Alert, Platform, StatusBar } from 'react-native';
+import { ScrollView, View, Alert } from 'react-native';
 import { useCharacterActions } from '@/features/characters/hooks/useCharacters';
 import { CharacterForm } from '@/features/characters/components/CharacterForm';
 import { Button } from '@/components/ui/Button';
 import { Character } from '@/types/character';
+import { COLORS, SPACING } from '@/constants/theme';
 import { STRINGS } from '@/constants/strings';
 
 export function CharacterPreviewScreen({ route, navigation }: any) {
@@ -11,7 +12,6 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
   const { importCharacter, editCharacter } = useCharacterActions();
   const [character, setCharacter] = useState<Character>(initialCharacter);
   const [isSaving, setIsSaving] = useState(false);
-  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0;
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -44,16 +44,23 @@ export function CharacterPreviewScreen({ route, navigation }: any) {
   };
 
   return (
-    <ScrollView className="flex-1 bg-gray-100 dark:bg-gray-900">
-      <View className="p-4">
+    <ScrollView
+      style={{ flex: 1, backgroundColor: COLORS.neutral[50] }}
+      contentContainerStyle={{ paddingBottom: SPACING['6xl'] }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={{ padding: SPACING.xl }}>
         <CharacterForm character={character} onChange={updateField} />
-        
-        <Button
-          onPress={handleSave}
-          title={isNew ? STRINGS.addCharacter : STRINGS.saveChanges}
-          icon="checkmark-circle-outline"
-          loading={isSaving}
-        />
+
+        <View style={{ marginTop: SPACING['4xl'] }}>
+          <Button
+            onPress={handleSave}
+            title={isNew ? STRINGS.addCharacter : STRINGS.saveChanges}
+            icon="checkmark-circle-outline"
+            loading={isSaving}
+            size="lg"
+          />
+        </View>
       </View>
     </ScrollView>
   );

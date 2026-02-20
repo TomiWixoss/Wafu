@@ -1,22 +1,31 @@
-import React, { useEffect } from 'react';
-import { View, Text, FlatList, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, FlatList, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useCharacters } from '@/features/characters/hooks/useCharacters';
 import { useCharacterImport } from '@/features/characters/hooks/useCharacterImport';
 import { CharacterCard } from '@/features/characters/components/CharacterCard';
 import { EmptyCharacterList } from '@/features/characters/components/EmptyCharacterList';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { SearchBar } from '@/components/ui/SearchBar';
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
+import { IconButton } from '@/components/ui/IconButton';
 import { showDeleteConfirm } from '@/utils/alerts';
 import { Character } from '@/types/character';
+import { COLORS, SPACING } from '@/constants/theme';
 import { STRINGS } from '@/constants/strings';
+import { useStore } from '@/store/useStore';
 
 export function CharacterListScreen({ navigation }: any) {
   const { characters, loadCharacters, deleteCharacter } = useCharacters();
   const { importFromImage, isImporting, error } = useCharacterImport();
+  const toggleFavorite = useStore(s => s.toggleFavorite);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    loadCharacters();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadCharacters();
+    }, [])
+  );
 
   useEffect(() => {
     if (error) {
@@ -41,6 +50,10 @@ export function CharacterListScreen({ navigation }: any) {
       STRINGS.whatToDo,
       [
         {
+          text: character.isFavorite ? '☆ Bỏ ghim' : '★ Ghim',
+          onPress: () => toggleFavorite(character.id),
+        },
+        {
           text: STRINGS.edit,
           onPress: () => navigation.navigate('CharacterPreview', { character, isNew: false }),
         },
@@ -54,32 +67,45 @@ export function CharacterListScreen({ navigation }: any) {
     );
   };
 
-  return (
-    <SafeAreaView className="flex-1 bg-gray-100 dark:bg-gray-900" edges={['top']}>
-      <View className="p-4 flex-1">
-        <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          {STRINGS.characters}
-        </Text>
+  const filteredCharacters = characters.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-        {characters.length === 0 ? (
+  return (
+    <View style={{ flex: 1, backgroundColor: COLORS.neutral[50] }}>
+      <ScreenHeader title={STRINGS.characters} />
+
+      <View style={{ flex: 1, paddingHorizontal: SPACING.xl }}>
+        {/* Search */}
+        <View style={{ marginTop: SPACING.xl, marginBottom: SPACING.lg }}>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder={STRINGS.searchCharacters}
+          />
+        </View>
+
+        {filteredCharacters.length === 0 && searchQuery === '' ? (
           <EmptyCharacterList />
         ) : (
           <FlatList
-            data={characters}
+            data={filteredCharacters}
             renderItem={({ item }) => (
               <CharacterCard
                 character={item}
                 onPress={() => handleCharacterPress(item)}
                 onLongPress={() => handleCharacterLongPress(item)}
+                onToggleFavorite={() => toggleFavorite(item.id)}
               />
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
           />
         )}
 
         <FloatingActionButton onPress={handleImport} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

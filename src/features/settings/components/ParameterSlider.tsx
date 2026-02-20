@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS, FONT_FAMILY, FONT_SIZE, SPACING, RADII } from '@/constants/theme';
 
 interface ParameterSliderProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -28,28 +29,104 @@ export function ParameterSlider({
     onChange(Math.max(min, Math.min(max, val)));
   };
 
+  // Calculate fill percentage for visual bar
+  const fillPercent = ((value - min) / (max - min)) * 100;
+
   return (
-    <View className="mb-6">
-      <View className="flex-row items-center mb-2">
-        <Ionicons name={icon} size={18} color="#6B7280" />
-        <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
-          {label}: {value.toFixed(2)}
+    <View style={{ marginBottom: SPACING['3xl'] }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: SPACING.md,
+        }}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: COLORS.primary[100],
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: SPACING.md,
+            }}
+          >
+            <Ionicons name={icon} size={14} color={COLORS.primary[600]} />
+          </View>
+          <Text
+            style={{
+              fontFamily: FONT_FAMILY.semibold,
+              fontSize: FONT_SIZE.base,
+              color: COLORS.neutral[900],
+            }}
+          >
+            {label}
+          </Text>
+        </View>
+        <TextInput
+          value={value.toString()}
+          onChangeText={handleChange}
+          keyboardType="decimal-pad"
+          style={{
+            backgroundColor: COLORS.neutral[100],
+            paddingHorizontal: SPACING.lg,
+            paddingVertical: SPACING.md,
+            borderRadius: RADII.md,
+            fontFamily: FONT_FAMILY.semibold,
+            fontSize: FONT_SIZE.base,
+            color: COLORS.primary[600],
+            minWidth: 60,
+            textAlign: 'center',
+          }}
+        />
+      </View>
+
+      {/* Visual bar */}
+      <View
+        style={{
+          height: 6,
+          backgroundColor: COLORS.neutral[200],
+          borderRadius: 3,
+          overflow: 'hidden',
+        }}
+      >
+        <View
+          style={{
+            height: '100%',
+            width: `${fillPercent}%`,
+            backgroundColor: COLORS.primary[500],
+            borderRadius: 3,
+          }}
+        />
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: SPACING.xs,
+        }}
+      >
+        <Text style={{ fontFamily: FONT_FAMILY.regular, fontSize: FONT_SIZE.xs, color: COLORS.neutral[400] }}>
+          {min}
+        </Text>
+        <Text style={{ fontFamily: FONT_FAMILY.regular, fontSize: FONT_SIZE.xs, color: COLORS.neutral[400] }}>
+          {max}
         </Text>
       </View>
-      <View className="flex-row items-center">
-        <Text className="text-gray-600 dark:text-gray-400 mr-2">{min}</Text>
-        <View className="flex-1">
-          <TextInput
-            value={value.toString()}
-            onChangeText={handleChange}
-            keyboardType="decimal-pad"
-            className="bg-white dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white text-center"
-          />
-        </View>
-        <Text className="text-gray-600 dark:text-gray-400 ml-2">{max}</Text>
-      </View>
+
       {description && (
-        <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <Text
+          style={{
+            fontFamily: FONT_FAMILY.regular,
+            fontSize: FONT_SIZE.xs,
+            color: COLORS.neutral[400],
+            marginTop: SPACING.sm,
+          }}
+        >
           {description}
         </Text>
       )}
